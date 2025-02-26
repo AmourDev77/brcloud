@@ -1,0 +1,38 @@
+version: "3.8"
+services:
+    php:
+        image: php:8.2-apache
+        container_name: php
+        volumes:
+            - type: bind
+              source: ./src
+              target: /var/www/html
+            - type: bind
+              source: ./logs/php
+              target: /var/log/apache2
+        ports:
+            - "8080:80"
+        depends_on:
+            - mariadb
+        environment:
+            - MYSQL_HOST=mariadb
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+
+    
+    mariadb:
+        image: mariadb
+        container_name: mariadb
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        ports:
+            - "3306:3306"
+        volumes:
+            - mariadb_data:/var/lib/mysql
+            - ./logs/mariadb:/var/log/mysql:rw
+volumes:
+    mariadb_data: {}
